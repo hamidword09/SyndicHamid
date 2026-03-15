@@ -1,0 +1,17 @@
+# Fichiers inutiles
+.DS_Store
+Thumbs.db
+*.log
+
+# Dossiers système
+.venv/
+node_modules/
+.vscode/
+.idea/
+
+# Vercel
+.vercel/
+
+# Artifacts de l'agent (Optionnel, vous pouvez les garder si vous voulez les voir sur GitHub)
+.gemini/
+.system_generated/

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="fr" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syndic Gravity - Autres Revenus</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .revenue-card {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: var(--bg-panel-solid);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            gap: 20px;
+            transition: all 0.2s;
+        }
+        
+        .revenue-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
+            border-color: var(--border-solid);
+        }
+        
+        .revenue-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .revenue-details {
+            flex: 1;
+        }
+        
+        .revenue-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .revenue-meta {
+            display: flex;
+            gap: 16px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        .revenue-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .revenue-amount {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--success);
+            text-align: right;
+        }
+        body[dir="rtl"] .revenue-amount { text-align: left; }
+
+        .dropdown-wrapper { position: relative; }
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 180px;
+            background: var(--bg-panel-solid);
+            border: 1px solid var(--border-solid);
+            border-radius: 12px;
+            box-shadow: var(--shadow-glass);
+            padding: 8px;
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .dropdown-menu.open { display: flex; }
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+        }
+        .dropdown-item:hover { background: rgba(79, 70, 229, 0.08); color: var(--accent); }
+        .dropdown-item.danger:hover { background: rgba(239, 68, 68, 0.08); color: var(--danger); }
+    </style>
+</head>
+<body class="light-mode" dir="ltr">
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <i data-lucide="building-2" class="logo-icon"></i>
+                    <h1 class="logo-text">Syndic <span class="accent-text">Gravity</span></h1>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i data-lucide="layout-dashboard"></i>
+                            <span class="lang-fr">Tableau de Bord</span>
+                            <span class="lang-ar hidden">لوحة القيادة</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="residents.html" class="nav-link">
+                            <i data-lucide="users"></i>
+                            <span class="lang-fr">Propriétaires</span>
+                            <span class="lang-ar hidden">الملاك والسكان</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="revenues.html" class="nav-link">
+                            <i data-lucide="arrow-down-to-line"></i>
+                            <span class="lang-fr">Cotisations</span>
+                            <span class="lang-ar hidden">المساهمات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="extra_revenues.html" class="nav-link">
+                            <i data-lucide="plus-circle"></i>
+                            <span class="lang-fr">Autres Revenus</span>
+                            <span class="lang-ar hidden">مداخيل أخرى</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="annual_revenues.html" class="nav-link">
+                            <i data-lucide="calendar"></i>
+                            <span class="lang-fr">Bilan Annuel</span>
+                            <span class="lang-ar hidden">الحصيلة السنوية</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="repairs.html" class="nav-link">
+                            <i data-lucide="hammer"></i>
+                            <span class="lang-fr">Fonds de Réparation</span>
+                            <span class="lang-ar hidden">صندوق الإصلاحات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="expenses.html" class="nav-link">
+                            <i data-lucide="wallet"></i>
+                            <span class="lang-fr">Dépenses</span>
+                            <span class="lang-ar hidden">المصاريف</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="maintenance.html" class="nav-link">
+                            <i data-lucide="wrench"></i>
+                            <span class="lang-fr">Maintenance</span>
+                            <span class="lang-ar hidden">الصيانة</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="voting.html" class="nav-link">
+                            <i data-lucide="vote"></i>
+                            <span class="lang-fr">Votes</span>
+                            <span class="lang-ar hidden">التصويت</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="documents.html" class="nav-link">
+                            <i data-lucide="folder"></i>
+                            <span class="lang-fr">Documents</span>
+                            <span class="lang-ar hidden">الوثائق</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="reports.html" class="nav-link">
+                            <i data-lucide="file-bar-chart-2"></i>
+                            <span class="lang-fr">Rapports</span>
+                            <span class="lang-ar hidden">التقارير</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="theme-toggle" id="theme-btn">
+                    <i data-lucide="moon" class="dark-icon"></i>
+                    <i data-lucide="sun" class="light-icon hidden"></i>
+                    <span class="lang-fr theme-text">Mode Sombre</span>
+                    <span class="lang-ar hidden theme-text">الوضع الداكن</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <h2 class="page-title lang-fr">Autres Revenus</h2>
+                    <h2 class="page-title lang-ar hidden">مداخيل أخرى</h2>
+                    <p class="page-subtitle lang-fr">Gérez les revenus hors cotisations (dons, locations, placements...).</p>
+                    <p class="page-subtitle lang-ar hidden">إدارة المداخيل خارج المساهمات (تبرعات، كراء، استثمارات...).</p>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="lang-toggle" id="lang-btn">
+                        <i data-lucide="languages"></i>
+                        <span>AR / FR</span>
+                    </button>
+                    <div class="user-profile">
+                        <div class="avatar">
+                            <img src="https://ui-avatars.com/api/?name=Admin+Syndic&background=0D8ABC&color=fff" alt="Admin">
+                        </div>
+                        <div class="user-info">
+                            <span class="user-name">Admin Syndic</span>
+                            <span class="user-role">Gestionnaire</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-wrapper">
+                <div class="action-bar glass-panel" style="margin-bottom: 20px;">
+                    <button class="btn-primary admin-only" id="btn-add-revenue-extra">
+                        <i data-lucide="plus"></i>
+                        <span class="lang-fr">Ajouter un Revenu</span>
+                        <span class="lang-ar hidden">إضافة مدخول</span>
+                    </button>
+                </div>
+
+                <div id="extra-revenues-list">
+                    <!-- Example Entry 1 -->
+                    <div class="revenue-card" data-id="1">
+                        <div class="revenue-icon">
+                            <i data-lucide="home"></i>
+                        </div>
+                        <div class="revenue-details">
+                            <div class="revenue-title lang-fr">Location Terrasse (Antenne)</div>
+                            <div class="revenue-title lang-ar hidden">كراء السطح (لاقط هوائي)</div>
+                            <div class="revenue-meta">
+                                <span><i data-lucide="calendar"></i> 12 Mars 2026</span>
+                                <span><i data-lucide="user"></i> Opérateur Telecom</span>
+                            </div>
+                        </div>
+                        <div class="revenue-amount">+ 3 500 MAD</div>
+                        <div class="dropdown-wrapper admin-only">
+                            <button class="btn-icon-soft btn-dropdown-toggle"><i data-lucide="more-vertical"></i></button>
+                            <div class="dropdown-menu">
+                                <button class="dropdown-item btn-edit"><i data-lucide="pencil"></i><span>Modifier</span></button>
+                                <button class="dropdown-item btn-delete danger"><i data-lucide="trash-2"></i><span>Supprimer</span></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Example Entry 2 -->
+                    <div class="revenue-card" data-id="2">
+                        <div class="revenue-icon">
+                            <i data-lucide="heart"></i>
+                        </div>
+                        <div class="revenue-details">
+                            <div class="revenue-title lang-fr">Don anonyme - Embellissement</div>
+                            <div class="revenue-title lang-ar hidden">تبرع مجهول - تجميل</div>
+                            <div class="revenue-meta">
+                                <span><i data-lucide="calendar"></i> 05 Mars 2026</span>
+                                <span><i data-lucide="user"></i> -</span>
+                            </div>
+                        </div>
+                        <div class="revenue-amount">+ 500 MAD</div>
+                        <div class="dropdown-wrapper admin-only">
+                            <button class="btn-icon-soft btn-dropdown-toggle"><i data-lucide="more-vertical"></i></button>
+                            <div class="dropdown-menu">
+                                <button class="dropdown-item btn-edit"><i data-lucide="pencil"></i><span>Modifier</span></button>
+                                <button class="dropdown-item btn-delete danger"><i data-lucide="trash-2"></i><span>Supprimer</span></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Add/Edit -->
+    <div class="modal-overlay" id="modal-revenue-extra">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span class="lang-fr" id="modal-title-fr">Ajouter un Revenu</span>
+                    <span class="lang-ar hidden" id="modal-title-ar">إضافة مدخول</span>
+                </div>
+                <button class="btn-close" id="btn-close-modal"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-revenue-extra">
+                    <input type="hidden" id="edit-id">
+                    <div class="form-group">
+                        <label class="lang-fr">Titre / Source</label>
+                        <label class="lang-ar hidden">العنوان / المصدر</label>
+                        <input type="text" id="rev-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="lang-fr">Date</label>
+                        <label class="lang-ar hidden">التاريخ</label>
+                        <input type="date" id="rev-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="lang-fr">Payeur / Client</label>
+                        <label class="lang-ar hidden">الدافع / العميل</label>
+                        <input type="text" id="rev-payer">
+                    </div>
+                    <div class="form-group">
+                        <label class="lang-fr">Montant (MAD)</label>
+                        <label class="lang-ar hidden">المبلغ (درهم)</label>
+                        <input type="number" id="rev-amount" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="lang-fr">Catégorie</label>
+                        <label class="lang-ar hidden">الفئة</label>
+                        <select id="rev-category">
+                            <option value="rent">Location / كراء</option>
+                            <option value="donation">Donation / تبرع</option>
+                            <option value="interest">Intérêts / فوائد</option>
+                            <option value="other">Autre / أخرى</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="btn-cancel">
+                    <span class="lang-fr">Annuler</span>
+                    <span class="lang-ar hidden">إلغاء</span>
+                </button>
+                <button class="btn-primary" id="btn-save">
+                    <span class="lang-fr">Enregistrer</span>
+                    <span class="lang-ar hidden">حفظ</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/extra_revenues.js"></script>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

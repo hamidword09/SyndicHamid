@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syndic Gravity - Système de Vote</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .voting-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .vote-card {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .vote-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .vote-badge {
+            font-size: 0.7rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-active { background: #DCFCE7; color: #166534; }
+        .badge-closed { background: #F3F4F6; color: #4B5563; }
+
+        .vote-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .vote-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 15px;
+        }
+        .meta-item { display: flex; align-items: center; gap: 5px; }
+
+        .vote-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .option-item {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .option-item:hover {
+            border-color: var(--accent);
+            background: rgba(79, 70, 229, 0.02);
+        }
+        .option-item.selected {
+            border-color: var(--accent);
+            background: rgba(79, 70, 229, 0.05);
+        }
+        .option-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        .option-label { font-weight: 500; }
+        .option-stats { font-size: 0.8rem; font-weight: 600; color: var(--accent); }
+        
+        .option-progress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: rgba(79, 70, 229, 0.1);
+            transition: width 0.4s ease;
+        }
+
+        .vote-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+        .total-votes { font-size: 0.85rem; color: var(--text-muted); }
+    </style>
+</head>
+<body class="light-mode" dir="ltr">
+    <div class="app-container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <i data-lucide="building-2" class="logo-icon"></i>
+                    <h1 class="logo-text">Syndic <span class="accent-text">Gravity</span></h1>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i data-lucide="layout-dashboard"></i>
+                            <span class="lang-fr">Tableau de Bord</span>
+                            <span class="lang-ar hidden">لوحة القيادة</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="residents.html" class="nav-link">
+                            <i data-lucide="users"></i>
+                            <span class="lang-fr">Propriétaires</span>
+                            <span class="lang-ar hidden">الملاك والسكان</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="revenues.html" class="nav-link">
+                            <i data-lucide="arrow-down-to-line"></i>
+                            <span class="lang-fr">Cotisations</span>
+                            <span class="lang-ar hidden">المساهمات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="extra_revenues.html" class="nav-link">
+                            <i data-lucide="plus-circle"></i>
+                            <span class="lang-fr">Autres Revenus</span>
+                            <span class="lang-ar hidden">مداخيل أخرى</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="annual_revenues.html" class="nav-link">
+                            <i data-lucide="calendar"></i>
+                            <span class="lang-fr">Bilan Annuel</span>
+                            <span class="lang-ar hidden">الحصيلة السنوية</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="repairs.html" class="nav-link">
+                            <i data-lucide="hammer"></i>
+                            <span class="lang-fr">Fonds de Réparation</span>
+                            <span class="lang-ar hidden">صندوق الإصلاحات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="expenses.html" class="nav-link">
+                            <i data-lucide="wallet"></i>
+                            <span class="lang-fr">Dépenses</span>
+                            <span class="lang-ar hidden">المصاريف</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="maintenance.html" class="nav-link">
+                            <i data-lucide="wrench"></i>
+                            <span class="lang-fr">Maintenance</span>
+                            <span class="lang-ar hidden">الصيانة</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="voting.html" class="nav-link">
+                            <i data-lucide="vote"></i>
+                            <span class="lang-fr">Votes & Décisions</span>
+                            <span class="lang-ar hidden">التصويت</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="documents.html" class="nav-link">
+                            <i data-lucide="folder"></i>
+                            <span class="lang-fr">Documents</span>
+                            <span class="lang-ar hidden">الوثائق</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="reports.html" class="nav-link">
+                            <i data-lucide="file-bar-chart-2"></i>
+                            <span class="lang-fr">Rapports</span>
+                            <span class="lang-ar hidden">التقارير</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="theme-toggle" id="theme-btn"><i data-lucide="moon"></i> <span>Mode Sombre</span></button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <h2 class="page-title">Votes & Décisions</h2>
+                    <p class="page-subtitle">Participez à la vie de la copropriété.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="lang-toggle" id="lang-btn"><i data-lucide="languages"></i> AR/FR</button>
+                    <div class="user-profile">
+                        <div class="avatar"><img src="https://ui-avatars.com/api/?name=User" alt="User"></div>
+                        <div class="user-info"><span class="user-name">...</span><span class="user-role">...</span></div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-wrapper">
+                <div class="action-bar glass-panel">
+                    <div class="search-box">
+                        <i data-lucide="search"></i>
+                        <input type="text" placeholder="Rechercher un vote...">
+                    </div>
+                    <button class="btn-primary admin-only" id="btn-add-vote"><i data-lucide="plus"></i> Nouveau Vote</button>
+                </div>
+
+                <div class="voting-grid">
+                    <div class="vote-card glass-panel" data-id="v-1">
+                        <div class="vote-header">
+                            <span class="vote-badge badge-active">En cours</span>
+                            <span class="meta-item"><i data-lucide="clock" class="icon-xs"></i> Expire le: 25 Mars 2026</span>
+                        </div>
+                        <h3 class="vote-title">Élection du Gestionnaire (Syndic) - 2026/2027</h3>
+                        <p class="vote-desc">Veuillez choisir votre représentant pour l'année à venir.</p>
+                        
+                        <div class="vote-options">
+                            <div class="option-item" onclick="submitVote('v-1', 1)">
+                                <div class="option-progress" style="width: 65%;"></div>
+                                <div class="option-content">
+                                    <span class="option-label">M. Hassan Lahlou</span>
+                                    <span class="option-stats">65% (13 voix)</span>
+                                </div>
+                            </div>
+                            <div class="option-item" onclick="submitVote('v-1', 2)">
+                                <div class="option-progress" style="width: 35%;"></div>
+                                <div class="option-content">
+                                    <span class="option-label">Mme. Fatima Bennani</span>
+                                    <span class="option-stats">35% (7 voix)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vote-footer">
+                            <span class="total-votes">Total: 20/24 appartements</span>
+                            <button class="btn-secondary">Détails</button>
+                        </div>
+                    </div>
+
+                    <div class="vote-card glass-panel" data-id="v-2">
+                        <div class="vote-header">
+                            <span class="vote-badge badge-active">En cours</span>
+                            <span class="meta-item"><i data-lucide="clock" class="icon-xs"></i> Expire le: 20 Mars 2026</span>
+                        </div>
+                        <h3 class="vote-title">Autorisation Peinture Façade</h3>
+                        <p class="vote-desc">Approuvez-vous le devis de 250,000 MAD pour la rénovation de la façade ?</p>
+                        
+                        <div class="vote-options">
+                            <div class="option-item" onclick="submitVote('v-2', 1)">
+                                <div class="option-progress" style="width: 80%;"></div>
+                                <div class="option-content">
+                                    <span class="option-label">Oui, approuvé</span>
+                                    <span class="option-stats">80% (16 voix)</span>
+                                </div>
+                            </div>
+                            <div class="option-item" onclick="submitVote('v-2', 2)">
+                                <div class="option-progress" style="width: 20%;"></div>
+                                <div class="option-content">
+                                    <span class="option-label">Non, refusé</span>
+                                    <span class="option-stats">20% (4 voix)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vote-footer">
+                            <span class="total-votes">Total: 20/24 appartements</span>
+                            <button class="btn-secondary">Détails</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        window.submitVote = (voteId, optionId) => {
+            alert("Votre vote a été pris en compte. Dans une version réelle, cela serait sauvegardé en base de données.");
+        };
+    </script>
+</body>
+</html>

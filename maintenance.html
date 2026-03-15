@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="fr" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syndic Gravity - Demandes de Maintenance</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .maintenance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .maintenance-card {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .maintenance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .maintenance-id {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .maintenance-status {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .status-pending { background: #FEF3C7; color: #92400E; }
+        .status-in-progress { background: #DBEAFE; color: #1E40AF; }
+        .status-resolved { background: #D1FAE5; color: #065F46; }
+
+        .maintenance-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        .maintenance-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            font-size: 0.875rem;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+        }
+        .info-item i { width: 14px; height: 14px; }
+
+        .maintenance-desc {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-main);
+            background: rgba(0,0,0,0.03);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .maintenance-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-status-change {
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            background: var(--accent);
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body class="light-mode" dir="ltr">
+    <div class="app-container">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <i data-lucide="building-2" class="logo-icon"></i>
+                    <h1 class="logo-text">Syndic <span class="accent-text">Gravity</span></h1>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i data-lucide="layout-dashboard"></i>
+                            <span class="lang-fr">Tableau de Bord</span>
+                            <span class="lang-ar hidden">لوحة القيادة</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="residents.html" class="nav-link">
+                            <i data-lucide="users"></i>
+                            <span class="lang-fr">Propriétaires</span>
+                            <span class="lang-ar hidden">الملاك والسكان</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="revenues.html" class="nav-link">
+                            <i data-lucide="arrow-down-to-line"></i>
+                            <span class="lang-fr">Cotisations</span>
+                            <span class="lang-ar hidden">المساهمات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="extra_revenues.html" class="nav-link">
+                            <i data-lucide="plus-circle"></i>
+                            <span class="lang-fr">Autres Revenus</span>
+                            <span class="lang-ar hidden">مداخيل أخرى</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="annual_revenues.html" class="nav-link">
+                            <i data-lucide="calendar"></i>
+                            <span class="lang-fr">Bilan Annuel</span>
+                            <span class="lang-ar hidden">الحصيلة السنوية</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="repairs.html" class="nav-link">
+                            <i data-lucide="hammer"></i>
+                            <span class="lang-fr">Fonds de Réparation</span>
+                            <span class="lang-ar hidden">صندوق الإصلاحات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="expenses.html" class="nav-link">
+                            <i data-lucide="wallet"></i>
+                            <span class="lang-fr">Dépenses</span>
+                            <span class="lang-ar hidden">المصاريف</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="maintenance.html" class="nav-link">
+                            <i data-lucide="wrench"></i>
+                            <span class="lang-fr">Maintenance</span>
+                            <span class="lang-ar hidden">الصيانة</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="reports.html" class="nav-link">
+                            <i data-lucide="file-bar-chart-2"></i>
+                            <span class="lang-fr">Rapports</span>
+                            <span class="lang-ar hidden">التقارير</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="theme-toggle" id="theme-btn">
+                    <i data-lucide="moon" class="dark-icon"></i>
+                    <i data-lucide="sun" class="light-icon hidden"></i>
+                    <span class="lang-fr theme-text">Mode Sombre</span>
+                    <span class="lang-ar hidden theme-text">الوضع الداكن</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content area -->
+        <main class="main-content">
+            
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h2 class="page-title lang-fr">Demandes de Maintenance</h2>
+                    <h2 class="page-title lang-ar hidden">طلبات الصيانة</h2>
+                    <p class="page-subtitle lang-fr">Signalez et suivez les réparations de l'immeuble.</p>
+                    <p class="page-subtitle lang-ar hidden">الإبلاغ عن إصلاحات المبنى ومتابعتها.</p>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="lang-toggle" id="lang-btn">
+                        <i data-lucide="languages"></i>
+                        <span>AR / FR</span>
+                    </button>
+                    
+                    <button class="icon-btn notification-btn">
+                        <i data-lucide="bell"></i>
+                        <span class="badge">3</span>
+                    </button>
+                    
+                    <div class="user-profile">
+                        <div class="avatar">
+                            <img src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff" id="user-avatar" alt="User">
+                        </div>
+                        <div class="user-info">
+                            <span class="user-name">Chargement...</span>
+                            <span class="user-role">...</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="dashboard-wrapper">
+                
+                <!-- Action Bar -->
+                <div class="action-bar glass-panel">
+                    <div class="search-box">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="search-maintenance" placeholder="Rechercher une demande...">
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-primary" id="btn-add-maintenance">
+                            <i data-lucide="plus-circle"></i>
+                            <span class="lang-fr">Signaler un Problème</span>
+                            <span class="lang-ar hidden">الإبلاغ عن مشكلة</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Maintenance Grid -->
+                <div class="maintenance-grid" id="maintenance-list">
+                    <!-- Sample Card -->
+                    <div class="maintenance-card glass-panel" data-id="1">
+                        <div class="maintenance-header">
+                            <span class="maintenance-id">#MNT-2026-001</span>
+                            <span class="maintenance-status status-pending lang-fr">En attente</span>
+                            <span class="maintenance-status status-pending lang-ar hidden">في الانتظار</span>
+                        </div>
+                        <h3 class="maintenance-title">Fuite d'eau - Couloir 2ème étage</h3>
+                        <div class="maintenance-info">
+                            <div class="info-item">
+                                <i data-lucide="user"></i>
+                                <span>Signalé par: Hassan Lahlou (Apt 01)</span>
+                            </div>
+                            <div class="info-item">
+                                <i data-lucide="calendar"></i>
+                                <span>Date: 12 Mars 2026</span>
+                            </div>
+                        </div>
+                        <p class="maintenance-desc">
+                            Il y a une fuite d'eau importante au plafond du couloir devant l'ascenseur. Risque de court-circuit.
+                        </p>
+                        <div class="maintenance-footer admin-only">
+                            <button class="btn-status-change" onclick="changeStatus(1)">
+                                <i data-lucide="refresh-cw"></i>
+                                <span class="lang-fr">Changer Statut</span>
+                                <span class="lang-ar hidden">تغيير الحالة</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="maintenance-card glass-panel" data-id="2">
+                        <div class="maintenance-header">
+                            <span class="maintenance-id">#MNT-2026-002</span>
+                            <span class="maintenance-status status-in-progress lang-fr">En cours</span>
+                            <span class="maintenance-status status-in-progress lang-ar hidden">قيد التنفيذ</span>
+                        </div>
+                        <h3 class="maintenance-title">Panne Lumière Escalier B</h3>
+                        <div class="maintenance-info">
+                            <div class="info-item">
+                                <i data-lucide="user"></i>
+                                <span>Signalé par: Karim Idrissi (Apt 03)</span>
+                            </div>
+                            <div class="info-item">
+                                <i data-lucide="calendar"></i>
+                                <span>Date: 10 Mars 2026</span>
+                            </div>
+                        </div>
+                        <p class="maintenance-desc">
+                            Les lumières de l'escalier B ne s'allument plus entre le 1er et le 3ème étage.
+                        </p>
+                        <div class="maintenance-footer admin-only">
+                            <button class="btn-status-change" onclick="changeStatus(2)">
+                                <i data-lucide="refresh-cw"></i>
+                                <span class="lang-fr">Changer Statut</span>
+                                <span class="lang-ar hidden">تغيير الحالة</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Signaler Problème -->
+    <div class="modal-overlay" id="modal-add-maintenance">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title lang-fr">Signaler un Problème</div>
+                <div class="modal-title lang-ar hidden">الإبلاغ عن مشكلة</div>
+                <button class="btn-close" id="btn-close-modal"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-add-maintenance">
+                    <div class="form-group">
+                        <label class="lang-fr">Titre du Problème</label>
+                        <label class="lang-ar hidden">عنوان المشكلة</label>
+                        <input type="text" id="m-title" placeholder="Ex: Panne ascenseur" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="lang-fr">Catégorie</label>
+                        <label class="lang-ar hidden">الفئة</label>
+                        <select id="m-category">
+                            <option value="Plomberie">Plomberie</option>
+                            <option value="Électricité">Électricité</option>
+                            <option value="Ascenseur">Ascenseur</option>
+                            <option value="Parties Communes">Parties Communes</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="lang-fr">Description détaillée</label>
+                        <label class="lang-ar hidden">وصف مفصل</label>
+                        <textarea id="m-desc" rows="4" placeholder="Décrivez le problème ici..." required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="btn-cancel-modal">
+                    <span class="lang-fr">Annuler</span>
+                    <span class="lang-ar hidden">إلغاء</span>
+                </button>
+                <button class="btn-primary" id="btn-save-maintenance">
+                    <span class="lang-fr">Envoyer la demande</span>
+                    <span class="lang-ar hidden">إرسال الطلب</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userRole = localStorage.getItem('userRole') || 'resident';
+            const userName = localStorage.getItem('userName') || 'Résident';
+            
+            const list = document.getElementById('maintenance-list');
+            const searchInput = document.getElementById('search-maintenance');
+            const btnAdd = document.getElementById('btn-add-maintenance');
+            const modal = document.getElementById('modal-add-maintenance');
+            const btnClose = document.getElementById('btn-close-modal');
+            const btnCancel = document.getElementById('btn-cancel-modal');
+            const btnSave = document.getElementById('btn-save-maintenance');
+            const form = document.getElementById('form-add-maintenance');
+
+            // --- Modal Logic ---
+            const openModal = () => modal.classList.add('active');
+            const closeModal = () => {
+                modal.classList.remove('active');
+                form.reset();
+            };
+
+            btnAdd.addEventListener('click', openModal);
+            [btnClose, btnCancel].forEach(btn => btn.addEventListener('click', closeModal));
+
+            // --- Save Logic ---
+            btnSave.addEventListener('click', (e) => {
+                e.preventDefault();
+                const title = document.getElementById('m-title').value;
+                const desc = document.getElementById('m-desc').value;
+                const cat = document.getElementById('m-category').value;
+
+                if (!title || !desc) {
+                    alert("Veuillez remplir tous les champs.");
+                    return;
+                }
+
+                const id = Math.floor(Math.random() * 1000);
+                const date = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+                const mId = `#MNT-2026-${String(id).padStart(3, '0')}`;
+
+                const card = document.createElement('div');
+                card.className = 'maintenance-card glass-panel';
+                card.setAttribute('data-id', id);
+                card.innerHTML = `
+                    <div class="maintenance-header">
+                        <span class="maintenance-id">${mId}</span>
+                        <span class="maintenance-status status-pending lang-fr">En attente</span>
+                        <span class="maintenance-status status-pending lang-ar hidden">في الانتظار</span>
+                    </div>
+                    <h3 class="maintenance-title">${cat}: ${title}</h3>
+                    <div class="maintenance-info">
+                        <div class="info-item">
+                            <i data-lucide="user"></i>
+                            <span>Signalé par: ${userName}</span>
+                        </div>
+                        <div class="info-item">
+                            <i data-lucide="calendar"></i>
+                            <span>Date: ${date}</span>
+                        </div>
+                    </div>
+                    <p class="maintenance-desc">${desc}</p>
+                    <div class="maintenance-footer admin-only">
+                        <button class="btn-status-change" onclick="changeStatus(${id})">
+                            <i data-lucide="refresh-cw"></i>
+                            <span class="lang-fr">Changer Statut</span>
+                            <span class="lang-ar hidden">تغيير الحالة</span>
+                        </button>
+                    </div>
+                `;
+
+                list.insertBefore(card, list.firstChild);
+                lucide.createIcons();
+                
+                // Hide/Show based on role
+                if (userRole === 'resident') {
+                    card.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
+                }
+                
+                closeModal();
+            });
+
+            // --- Search Logic ---
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                document.querySelectorAll('.maintenance-card').forEach(card => {
+                    const text = card.textContent.toLowerCase();
+                    card.style.display = text.includes(query) ? 'flex' : 'none';
+                });
+            });
+
+            // --- Status Change Logic (Mock) ---
+            window.changeStatus = (id) => {
+                const card = document.querySelector(`.maintenance-card[data-id="${id}"]`);
+                const statusFr = card.querySelector('.maintenance-status.lang-fr');
+                const statusAr = card.querySelector('.maintenance-status.lang-ar');
+                
+                if (statusFr.textContent === 'En attente') {
+                    statusFr.textContent = 'En cours';
+                    statusFr.className = 'maintenance-status status-in-progress lang-fr';
+                    statusAr.textContent = 'قيد التنفيذ';
+                    statusAr.className = 'maintenance-status status-in-progress lang-ar';
+                } else if (statusFr.textContent === 'En cours') {
+                    statusFr.textContent = 'Résolu';
+                    statusFr.className = 'maintenance-status status-resolved lang-fr';
+                    statusAr.textContent = 'تم الحل';
+                    statusAr.className = 'maintenance-status status-resolved lang-ar';
+                } else {
+                    statusFr.textContent = 'En attente';
+                    statusFr.className = 'maintenance-status status-pending lang-fr';
+                    statusAr.textContent = 'في الانتظار';
+                    statusAr.className = 'maintenance-status status-pending lang-ar';
+                }
+            };
+        });
+    </script>
+</body>
+</html>
