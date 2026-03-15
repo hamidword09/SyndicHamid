@@ -3,8 +3,8 @@
 // 2. Project Settings > API
 // 3. Copiez l'URL et la clé 'anon' public
 
-const SUPABASE_URL = 'VOTRE_URL_SUPABASE';
-const SUPABASE_ANON_KEY = 'VOTRE_CLE_ANON_SUPABASE';
+const SUPABASE_URL = 'https://umgmnzvoezxdcjbecwbl.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtZ21uenZvZXp4ZGNqYmVjd2JsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzEzOTksImV4cCI6MjA4OTE0NzM5OX0.b9TyhE4CvQd1lLQNSzCShWeQw3Sctw4FXeypvWDnDeI';
 
 // Initialisation du client (Assurez-vous d'avoir ajouté le SDK dans le HTML)
 // <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
