@@ -22,6 +22,55 @@
             gap: 24px;
             margin-top: 24px;
         }
+        .ai-assistant-card {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .ai-assistant-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: var(--gradient-accent);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .ai-insight {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            border: 1px solid rgba(79, 70, 229, 0.1);
+        }
+        .qr-mockup {
+            width: 120px;
+            height: 120px;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            margin: 10px auto;
+            border: 1px solid var(--border-color);
+        }
         .approval-card {
             display: flex;
             flex-direction: column;
@@ -236,44 +285,93 @@
                         </div>
                     </section>
 
+                <div class="dashboard-row">
                     <!-- Global Config -->
                     <section class="glass-panel flex-1">
                         <div class="section-header">
-                            <h3 class="lang-fr">Paramètres Globaux</h3>
-                            <h3 class="lang-ar hidden">الإعدادات العامة</h3>
+                            <h3 class="lang-fr">Paramètres Avancés</h3>
+                            <h3 class="lang-ar hidden">إعدادات متقدمة</h3>
                         </div>
                         
-                        <div class="settings-form">
-                            <div class="input-group">
-                                <label>Nom de la Résidence</label>
-                                <input type="text" class="input-form" value="Résidence Les Oliviers" id="res-name">
+                        <div class="settings-form" style="padding: 24px;">
+                            <div class="section-header" style="padding: 0 0 10px 0; border:0;">
+                                <h4 class="text-sm">🚀 Rappels & Automatisation</h4>
                             </div>
-                            <div class="input-group">
-                                <label>Cotisation par défaut (MAD)</label>
-                                <input type="number" class="input-form" value="100" id="def-contrib">
+                            <label class="switch-container">
+                                <span>Rappels Automatiques (WhatsApp/Email)</span>
+                                <div class="switch">
+                                    <input type="checkbox" id="auto-reminders" checked>
+                                    <span class="slider"></span>
+                                </div>
+                            </label>
+                            <p class="text-xs" style="margin: 5px 0 15px 0; opacity: 0.7;">Envoie un rappel automatique chaque 5 du mois aux retardataires.</p>
+
+                            <div class="section-header" style="padding: 10px 0; border:0;">
+                                <h4 class="text-sm">💳 Paiement Électronique</h4>
                             </div>
-                            <div class="input-group">
-                                <label>Email de support Syndic</label>
-                                <input type="email" class="input-form" value="syndic@lesoliviers.ma">
+                            <label class="switch-container">
+                                <span>Activer le paiement par QR Code</span>
+                                <div class="switch">
+                                    <input type="checkbox" id="qr-payment" checked>
+                                    <span class="slider"></span>
+                                </div>
+                            </label>
+                            <div class="qr-mockup">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=RIB-MA64-0012-0000-0000-1234-5678-9012" alt="QR Code Payment" style="width:100%">
                             </div>
-                            <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="saveGlobalSettings()">
-                                <i data-lucide="save"></i> Enregistrer
+                            <p class="text-xs" style="text-align:center; opacity: 0.7;">Scannez pour payer (RIB Résidence)</p>
+                            
+                            <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
+                            
+                            <button class="btn-primary" style="width: 100%;" onclick="updateAdvancedSettings()">
+                                <i data-lucide="refresh-cw"></i> Synchroniser les services
+                            </button>
+                        </div>
+                    </section>
+
+                    <!-- AI Assistant Section -->
+                    <section class="glass-panel flex-1">
+                        <div class="ai-assistant-card">
+                            <div class="ai-badge">
+                                <i data-lucide="sparkles"></i>
+                                <span class="lang-fr">Assistant Intelligent IA</span>
+                                <span class="lang-ar hidden">المساعد الذكي</span>
+                            </div>
+                            <h3 style="margin-bottom: 12px;">Analyses & Insights</h3>
+                            
+                            <div class="ai-insight">
+                                <i data-lucide="trending-up" class="text-success"></i>
+                                <div>
+                                    <small class="text-muted">Revenus mensuels</small>
+                                    <p class="text-sm">Les cotisations sont en hausse de <strong>12%</strong> par rapport au mois dernier.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="ai-insight">
+                                <i data-lucide="alert-circle" class="text-warning"></i>
+                                <div>
+                                    <small class="text-muted">Optimisation des charges</small>
+                                    <p class="text-sm">La consommation d'électricité des communs a augmenté la nuit. Vérifiez les minuteries.</p>
+                                </div>
+                            </div>
+
+                            <button class="btn-primary" style="width: 100%; background: var(--gradient-accent); border: none; margin-top: 10px;">
+                                <i data-lucide="brain-circuit"></i> Générer un rapport IA
                             </button>
                         </div>
 
-                        <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
-                        
-                        <div class="section-header">
-                            <h3 class="lang-fr">Sécurité du Site</h3>
-                        </div>
-                        <label class="switch-container">
-                            <span>Maintenance du site</span>
-                            <div class="switch">
-                                <input type="checkbox" id="maintenance-mode">
-                                <span class="slider"></span>
+                        <div style="padding: 24px;">
+                            <h4>Application Mobile</h4>
+                            <p class="text-sm text-muted" style="margin-top: 8px;">Votre application est prête pour le mobile. Installez-la comme une "Web App" sur iPhone & Android.</p>
+                            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                                <div style="flex: 1; opacity: 0.8; background: #000; color: white; padding: 10px; border-radius: 8px; text-align: center; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                    <i data-lucide="apple"></i> App Store
+                                </div>
+                                <div style="flex: 1; opacity: 0.8; background: #000; color: white; padding: 10px; border-radius: 8px; text-align: center; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                    <i data-lucide="play"></i> Play Store
+                                </div>
                             </div>
-                        </label>
-                        <p class="text-xs" style="margin-top: 10px; opacity: 0.7;">Activez ce mode pour empêcher les habitants de se connecter pendant les mises à jour.</p>
+                        </div>
                     </section>
                 </div>
             </div>
@@ -317,6 +415,30 @@
             const name = document.getElementById('res-name').value;
             localStorage.setItem('residenceName', name);
             alert(localStorage.getItem('lang') === 'ar' ? 'تم حفظ الإعدادات' : 'Paramètres enregistrés !');
+        }
+
+        function updateAdvancedSettings() {
+            const autoReminders = document.getElementById('auto-reminders').checked;
+            const qrPayment = document.getElementById('qr-payment').checked;
+            
+            localStorage.setItem('autoReminders', autoReminders);
+            localStorage.setItem('qrPaymentEnabled', qrPayment);
+            
+            const btn = event.currentTarget;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Mise à jour...';
+            lucide.createIcons({nodes: [btn]});
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i data-lucide="check"></i> Synchronisé !';
+                btn.style.background = '#10b981';
+                lucide.createIcons({nodes: [btn]});
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.style.background = '';
+                    lucide.createIcons({nodes: [btn]});
+                }, 2000);
+            }, 1500);
         }
     </script>
 </body>
