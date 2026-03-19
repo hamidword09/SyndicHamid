@@ -15,3 +15,10 @@ node_modules/
 # Artifacts de l'agent (Optionnel, vous pouvez les garder si vous voulez les voir sur GitHub)
 .gemini/
 .system_generated/
+
+# Secrets / configuration locale
+.env
+*.env
+backend/.env
+
+.vercel

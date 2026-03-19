@@ -70,6 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
             currentFrElements.forEach(el => el.classList.remove('hidden'));
         }
         localStorage.setItem('lang', currentLang);
+        
+        // Dynamically translate selects, inputs, etc.
+        if (typeof window.applyTranslationsToElements === 'function') {
+            window.applyTranslationsToElements();
+        }
     };
 
     const toggleTheme = () => {

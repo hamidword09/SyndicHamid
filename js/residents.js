@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('search-input-fr'),
         document.getElementById('search-input-ar')
     ];
-    let tableRows = document.querySelectorAll('.data-table tbody tr');
 
     // --- DOM Elements for Add Modal ---
     const btnAdd = document.getElementById('btn-add-resident');
@@ -31,19 +30,127 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnSaveEdit = document.getElementById('btn-save-edit');
     const editForm = document.getElementById('form-edit-resident');
 
-    let editingRow = null; // track which row is being edited
+    let editingRowId = null; // track id for edit
+
+    // --- API Calls ---
+    async function fetchResidents() {
+        try {
+            const res = await fetch(`${API_URL}/residents`);
+            const data = await res.json();
+            if(!data.error) {
+                renderResidents(data);
+            }
+        } catch(e) {
+            console.error("Erreur API:", e);
+        }
+    }
+
+    async function addResident(payload) {
+        try {
+            const res = await fetch(`${API_URL}/residents`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            return await res.json();
+        } catch(e) {
+            console.error("Erreur API:", e);
+        }
+    }
+
+    async function updateResident(id, payload) {
+        try {
+            const res = await fetch(`${API_URL}/residents/${id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            return await res.json();
+        } catch(e) {
+            console.error("Erreur API:", e);
+        }
+    }
+
+    async function deleteResident(id) {
+        try {
+            const res = await fetch(`${API_URL}/residents/${id}`, {
+                method: "DELETE"
+            });
+            return await res.json();
+        } catch(e) {
+            console.error("Erreur API:", e);
+        }
+    }
+
+    // --- Render Table ---
+    function renderResidents(residents) {
+        const tbody = document.querySelector('.data-table tbody');
+        tbody.innerHTML = '';
+
+        const currentLang = localStorage.getItem('lang') || 'fr';
+
+        residents.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-id', r.id);
+
+            const apt = r.apt || '';
+            const name = r.name || 'Inconnu';
+            const type = r.type || '';
+            const phone = r.phone || '-';
+            const email = r.email || '-';
+            const contrib = r.contribution || 0;
+            const status = r.status || 'À jour';
+
+            const statusClass = status === 'À jour' ? 'active' : 'pending';
+
+            tr.innerHTML = `
+                <td>
+                    <div class="apt-badge">${apt}</div>
+                </td>
+                <td>
+                    <div class="user-desc">
+                        <strong>${name}</strong>
+                        <span class="text-sm">${type}</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="contact-info">
+                        <span><i data-lucide="phone" class="icon-sm"></i> ${phone}</span>
+                        <span><i data-lucide="mail" class="icon-sm"></i> ${email}</span>
+                        <span class="text-xs">Cotisation: <strong>${contrib} MAD</strong></span>
+                    </div>
+                </td>
+                <td>
+                    <span class="status ${statusClass} lang-fr">${status}</span>
+                    <span class="status ${statusClass} lang-ar hidden">${status === 'À jour' ? 'مُحدَّث' : 'تأخير'}</span>
+                </td>
+                <td class="text-right admin-only">
+                    <button class="btn-icon-soft btn-edit-resident" title="Modifier" data-id="${r.id}"><i data-lucide="edit"></i></button>
+                    <button class="btn-icon-soft btn-del-resident" title="Supprimer" data-id="${r.id}" style="color:var(--danger);"><i data-lucide="trash-2"></i></button>
+                </td>
+            `;
+
+            if (currentLang === 'ar') {
+                tr.querySelectorAll('.lang-fr').forEach(el => el.classList.add('hidden'));
+                tr.querySelectorAll('.lang-ar').forEach(el => el.classList.remove('hidden'));
+            }
+
+            tbody.appendChild(tr);
+        });
+
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+        attachActionsListeners(residents);
+    }
 
     // --- Search functionality ---
     const performSearch = (e) => {
         const query = e.target.value.toLowerCase();
-
-        tableRows.forEach(row => {
+        document.querySelectorAll('.data-table tbody tr').forEach(row => {
             const textContent = row.textContent.toLowerCase();
-            if (textContent.includes(query)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+            row.style.display = textContent.includes(query) ? '' : 'none';
         });
 
         // Sync both inputs
@@ -57,7 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInputs.forEach(input => {
         if (input) input.addEventListener('input', performSearch);
     });
-
 
     // --- Add Modal functionality ---
     const openModal = () => {
@@ -78,20 +184,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btn) btn.addEventListener('click', closeModal);
     });
 
-    // Close on overlay click
     if (modal) {
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
-            }
+            if (e.target === modal) closeModal();
         });
     }
 
     // --- Handle Save (Add New) ---
-    const handleSave = (e) => {
+    const handleSave = async (e) => {
         e.preventDefault();
 
-        // Get values
         const name = document.getElementById('input-name').value;
         const apt = document.getElementById('input-apt').value;
         const phone = document.getElementById('input-phone').value;
@@ -104,58 +206,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // --- Create New Row ---
-        const tbody = document.querySelector('.data-table tbody');
-        const newRow = document.createElement('tr');
-        
-        newRow.innerHTML = `
-            <td>
-                <div class="apt-badge">${apt}</div>
-                <span class="text-sm">Nouveau</span>
-            </td>
-            <td>
-                <div class="user-desc">
-                    <strong>${name}</strong>
-                    <span class="text-sm">${type}</span>
-                </div>
-            </td>
-            <td>
-                <div class="contact-info">
-                    <span><i data-lucide="phone" class="icon-sm"></i> ${phone || '-'}</span>
-                    <span><i data-lucide="mail" class="icon-sm"></i> ${email || '-'}</span>
-                    <span class="text-xs">Cotisation: <strong>${contribution || '0'} MAD</strong></span>
-                </div>
-            </td>
-            <td>
-                <span class="status active lang-fr">À jour</span>
-                <span class="status active lang-ar hidden">مُحدَّث</span>
-            </td>
-            <td class="text-right admin-only">
-                <button class="btn-icon-soft btn-edit-resident" title="Modifier"><i data-lucide="edit"></i></button>
-                <button class="btn-icon-soft" title="Historique"><i data-lucide="history"></i></button>
-            </td>
-        `;
+        const payload = {
+            name, apt, phone, email, type,
+            contribution: parseFloat(contribution) || 0,
+            status: "À jour"
+        };
 
-        tbody.insertBefore(newRow, tbody.firstChild);
-
-        // Re-init lucide icons for new elements
-        if (window.lucide) {
-            lucide.createIcons();
+        const res = await addResident([payload]);
+        if (!res.error) {
+            closeModal();
+            fetchResidents(); // reload
         }
-        
-        // Ensure new elements follow current language and role
-        const currentLang = localStorage.getItem('lang') || 'fr';
-        if (currentLang === 'ar') {
-            newRow.querySelectorAll('.lang-fr').forEach(el => el.classList.add('hidden'));
-            newRow.querySelectorAll('.lang-ar').forEach(el => el.classList.remove('hidden'));
-        }
-
-        tableRows = document.querySelectorAll('.data-table tbody tr');
-
-        // Attach edit listener to new row's edit button
-        attachEditListeners();
-
-        closeModal();
     };
 
     [btnSave, btnSaveAr].forEach(btn => {
@@ -163,170 +224,95 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ═══════════════════════════════════════
-    //  EDIT MODAL FUNCTIONALITY
+    //  EDIT & DELETE FUNCTIONALITY
     // ═══════════════════════════════════════
 
-    const openEditModal = (row) => {
-        editingRow = row;
+    const openEditModal = (resident) => {
+        editingRowId = resident.id;
 
-        // Extract current values from the row
-        const aptBadge = row.querySelector('.apt-badge');
-        const nameEl = row.querySelector('.user-desc strong');
-        const typeEl = row.querySelector('.user-desc .text-sm');
-        const phoneEl = row.querySelector('.contact-info span');
-
-        // Fill edit form
-        document.getElementById('edit-apt').value = aptBadge ? aptBadge.textContent.trim() : '';
-        document.getElementById('edit-name').value = nameEl ? nameEl.textContent.trim() : '';
+        document.getElementById('edit-apt').value = resident.apt || '';
+        document.getElementById('edit-name').value = resident.name || '';
+        document.getElementById('edit-phone').value = resident.phone || '';
+        document.getElementById('edit-email').value = resident.email || '';
+        document.getElementById('edit-contribution').value = resident.contribution || '';
         
-        // Extract phone and email
-        const phoneSpan = row.querySelector('.contact-info span:nth-child(1)');
-        const emailSpan = row.querySelector('.contact-info span:nth-child(2)');
-        const contributionEl = row.querySelector('.contact-info strong');
-
-        if (phoneSpan) {
-            document.getElementById('edit-phone').value = phoneSpan.textContent.replace(/^.*? /, '').trim();
-        } else {
-            document.getElementById('edit-phone').value = '';
-        }
-
-        if (emailSpan) {
-            document.getElementById('edit-email').value = emailSpan.textContent.replace(/^.*? /, '').trim();
-        } else {
-            document.getElementById('edit-email').value = '';
-        }
-
-        if (contributionEl) {
-            document.getElementById('edit-contribution').value = contributionEl.textContent.replace(' MAD', '').trim();
-        } else {
-            document.getElementById('edit-contribution').value = '';
-        }
-
-        // Set the type dropdown
         const typeSelect = document.getElementById('edit-type');
-        if (typeEl) {
-            const typeText = typeEl.textContent.trim();
-            for (let i = 0; i < typeSelect.options.length; i++) {
-                if (typeSelect.options[i].value === typeText || typeSelect.options[i].text === typeText) {
-                    typeSelect.selectedIndex = i;
-                    break;
-                }
+        for (let i = 0; i < typeSelect.options.length; i++) {
+            if (typeSelect.options[i].value === resident.type) {
+                typeSelect.selectedIndex = i;
+                break;
             }
         }
 
-        // Show the modal
         editModal.classList.add('active');
         document.getElementById('edit-name').focus();
-
-        // Apply current language to modal
-        const currentLang = localStorage.getItem('lang') || 'fr';
-        if (currentLang === 'ar') {
-            editModal.querySelectorAll('.lang-fr').forEach(el => el.classList.add('hidden'));
-            editModal.querySelectorAll('.lang-ar').forEach(el => el.classList.remove('hidden'));
-        } else {
-            editModal.querySelectorAll('.lang-ar').forEach(el => el.classList.add('hidden'));
-            editModal.querySelectorAll('.lang-fr').forEach(el => el.classList.remove('hidden'));
-        }
-
-        if (window.lucide) lucide.createIcons();
     };
 
     const closeEditModal = () => {
         editModal.classList.remove('active');
         editForm.reset();
-        editingRow = null;
+        editingRowId = null;
     };
 
-    const handleEditSave = () => {
-        if (!editingRow) return;
+    const handleEditSave = async (e) => {
+        e.preventDefault();
+        if (!editingRowId) return;
 
-        const newName = document.getElementById('edit-name').value.trim();
-        const newApt = document.getElementById('edit-apt').value.trim();
-        const newPhone = document.getElementById('edit-phone').value.trim();
-        const newEmail = document.getElementById('edit-email').value.trim();
-        const newContribution = document.getElementById('edit-contribution').value.trim();
-        const newType = document.getElementById('edit-type').value;
+        const payload = {
+            name: document.getElementById('edit-name').value.trim(),
+            apt: document.getElementById('edit-apt').value.trim(),
+            phone: document.getElementById('edit-phone').value.trim(),
+            email: document.getElementById('edit-email').value.trim(),
+            contribution: parseFloat(document.getElementById('edit-contribution').value.trim()) || 0,
+            type: document.getElementById('edit-type').value
+        };
 
-        if (!newName || !newApt) {
+        if (!payload.name || !payload.apt) {
             alert('Veuillez remplir le nom et l\'appartement. / يرجى ملء الاسم والشقة.');
             return;
         }
 
-        // Update the row in place
-        const aptBadge = editingRow.querySelector('.apt-badge');
-        const nameEl = editingRow.querySelector('.user-desc strong');
-        const typeEl = editingRow.querySelector('.user-desc .text-sm');
-        const contactInfo = editingRow.querySelector('.contact-info');
-
-        if (aptBadge) aptBadge.textContent = newApt;
-        if (nameEl) nameEl.textContent = newName;
-        if (typeEl) typeEl.textContent = newType;
-        
-        if (contactInfo) {
-            const phoneSpan = contactInfo.querySelector('span:nth-child(1)');
-            const emailSpan = contactInfo.querySelector('span:nth-child(2)');
-            const contributionStrong = contactInfo.querySelector('strong');
-
-            if (phoneSpan) phoneSpan.innerHTML = `<i data-lucide="phone" class="icon-sm"></i> ${newPhone || '-'}`;
-            if (emailSpan) emailSpan.innerHTML = `<i data-lucide="mail" class="icon-sm"></i> ${newEmail || '-'}`;
-            if (contributionStrong) contributionStrong.textContent = `${newContribution || '0'} MAD`;
+        const res = await updateResident(editingRowId, payload);
+        if (!res.error) {
+            closeEditModal();
+            fetchResidents(); // refresh
         }
-
-        // Add a brief highlight animation to show the row was updated
-        editingRow.style.transition = 'background 0.5s ease';
-        editingRow.style.background = 'rgba(79, 70, 229, 0.15)';
-        setTimeout(() => {
-            editingRow.style.background = '';
-        }, 1500);
-
-        // Re-init lucide icons
-        if (window.lucide) lucide.createIcons();
-
-        closeEditModal();
     };
 
-    // Close edit modal
     [btnCloseEdit, btnCancelEdit].forEach(btn => {
         if (btn) btn.addEventListener('click', closeEditModal);
     });
 
-    // Save edit
     if (btnSaveEdit) btnSaveEdit.addEventListener('click', handleEditSave);
 
-    // Close on overlay click
     if (editModal) {
         editModal.addEventListener('click', (e) => {
-            if (e.target === editModal) {
-                closeEditModal();
-            }
+            if (e.target === editModal) closeEditModal();
         });
     }
 
-    // Attach edit listeners to all edit buttons
-    const attachEditListeners = () => {
+    const attachActionsListeners = (residentsData) => {
+        // Édition
         document.querySelectorAll('.btn-edit-resident').forEach(btn => {
-            // Remove old listeners by cloning
-            const newBtn = btn.cloneNode(true);
-            btn.parentNode.replaceChild(newBtn, btn);
-            
-            newBtn.addEventListener('click', () => {
-                const row = newBtn.closest('tr');
-                if (row) openEditModal(row);
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                const resident = residentsData.find(r => r.id === id);
+                if (resident) openEditModal(resident);
             });
         });
 
-        // Re-init lucide icons for cloned buttons
-        if (window.lucide) lucide.createIcons();
-
-        // Attach History listeners
-        document.querySelectorAll('.btn-icon-soft[title="Historique"]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const name = btn.closest('tr').querySelector('.user-desc strong').textContent;
-                alert((localStorage.getItem('lang') === 'ar' ? 'سجل العمليات لـ ' : 'Historique des opérations pour ') + name);
+        // Suppression
+        document.querySelectorAll('.btn-del-resident').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                if (confirm(localStorage.getItem('lang') === 'ar' ? "هل أنت متأكد من الحذف؟" : "Êtes-vous sûr de vouloir supprimer ce propriétaire ?")) {
+                    await deleteResident(id);
+                    fetchResidents(); // Refresh
+                }
             });
         });
     };
 
-    // Initial attachment
-    attachEditListeners();
+    // Initial Load
+    fetchResidents();
 });

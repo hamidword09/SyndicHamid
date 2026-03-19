@@ -382,9 +382,10 @@
         </main>
     </div>
 
+    <script src="js/supabase_config.js"></script>
+    <script src="js/translations.js"></script>
     <script src="js/app.js"></script>
     <script>
-        // Mock Data for the Annual Table
         const apartments = [
             "Apt 01 - Hassan Lahlou",
             "Apt 02 - Fatima Bennani",
@@ -393,19 +394,10 @@
             "Apt 05 - Amina El Fassi"
         ];
 
-        function getRandomStatus(monthIndex) {
-            // For future months in 2026, let's leave them empty
-            if (monthIndex > 2) return 'empty'; // After march
-
-            const rand = Math.random();
-            if (rand > 0.3) return 'paid';
-            return 'unpaid';
-        }
-
-        function loadYearData() {
+        async function loadYearData() {
             const tbody = document.getElementById('annual-tbody');
             const tfoot = document.getElementById('annual-tfoot');
-            tbody.innerHTML = ''; 
+            tbody.innerHTML = '<tr><td colspan="14" style="text-align:center;">Chargement... / جاري التحميل...</td></tr>'; 
             tfoot.innerHTML = '';
 
             // Sync search inputs
@@ -416,43 +408,92 @@
             document.getElementById('year-input').value = targetYear;
             document.getElementById('year-input-ar').value = targetYear;
 
+            // Structuring data
+            const yearData = {};
+
+            try {
+                // Fetch real data from backend
+                const res = await fetch(`${API_URL}/revenus`);
+                const data = await res.json();
+                
+                if (!data.error && Array.isArray(data)) {
+                    // Expect data like { apt, amount, payment_date } or similar
+                    // Map it to our yearData
+                    data.forEach(p => {
+                        const amount = parseFloat(p.amount) || 0;
+                        const dateStr = p.payment_date || p.date || ""; 
+                        if (dateStr.startsWith(targetYear)) {
+                            const aptStr = (p.apt || "Apt ??").toString();
+                            const ownerStr = p.owner || "Résident";
+                            const monthIdx = parseInt(dateStr.split('-')[1]) - 1;
+                            
+                            if (!yearData[aptStr]) {
+                                yearData[aptStr] = { owner: ownerStr, months: new Array(12).fill(0) };
+                            }
+                            // Sum if multiple payments in same month just in case
+                            yearData[aptStr].months[monthIdx] += amount;
+                        }
+                    });
+                }
+            } catch(e) {
+                console.error("Erreur API:", e);
+                // Fallback to local storage for test seamlessly
+                const annualData = JSON.parse(localStorage.getItem('annualRevenuesData')) || {};
+                Object.assign(yearData, annualData[targetYear] || {});
+            }
+
+            // Merging with default apartments
+            const allAptKeys = new Set([...apartments.map(a => a.split(' - ')[0]), ...Object.keys(yearData)]);
+            
             // Arrays to track column totals
             const columnTotals = new Array(12).fill(0);
             let grandTotal = 0;
+            
+            tbody.innerHTML = ''; // clear loading state
 
-            apartments.forEach(apt => {
+            allAptKeys.forEach(aptKey => {
                 const tr = document.createElement('tr');
                 let rowTotal = 0;
                 
+                // Get owner name and month data
+                let owner = "";
+                let months = new Array(12).fill(0);
+
+                if (yearData[aptKey]) {
+                    owner = yearData[aptKey].owner;
+                    months = yearData[aptKey].months;
+                } else {
+                    const defaultApt = apartments.find(a => a.startsWith(aptKey));
+                    if (defaultApt) {
+                        owner = defaultApt.split(' - ')[1];
+                        if (targetYear === '2026') {
+                            // Dummy data for visual
+                            for(let i=0; i<3; i++) months[i] = (Math.random() > 0.3 ? 100 : 0);
+                        }
+                    } else {
+                        owner = "Inconnu";
+                    }
+                }
+
                 // Apt Name Column
                 const nameTd = document.createElement('td');
-                const parts = apt.split(' - ');
                 nameTd.innerHTML = `
-                    <div class="apt-badge" style="display:inline-block; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.05); font-size:0.8rem; margin-right: 8px;">${parts[0]}</div>
-                    <span style="font-weight: 500;">${parts[1]}</span>
+                    <div class="apt-badge" style="display:inline-block; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.05); font-size:0.8rem; margin-right: 8px;">${aptKey}</div>
+                    <span style="font-weight: 500;">${owner}</span>
                 `;
                 tr.appendChild(nameTd);
 
                 // Months Columns
                 for (let i = 0; i < 12; i++) {
                     const td = document.createElement('td');
-                    let status = 'paid';
+                    const val = months[i];
                     
-                    if (targetYear === '2026') {
-                        status = getRandomStatus(i);
-                        if (i === 2 && apt.includes('Apt 02')) status = 'unpaid';
-                    } else if (targetYear < '2026') {
-                        status = Math.random() > 0.1 ? 'paid' : 'unpaid';
-                    } else {
-                        status = 'empty';
-                    }
-
-                    if (status === 'paid') {
-                        td.innerHTML = '<span style="color: var(--success); font-weight: 600;">100</span>';
-                        rowTotal += 100;
-                        columnTotals[i] += 100;
-                    } else if (status === 'unpaid') {
-                        td.innerHTML = '<span style="color: var(--danger); font-weight: 600;">0</span>';
+                    if (val > 0) {
+                        td.innerHTML = `<span style="color: var(--success); font-weight: 600;">${val}</span>`;
+                        rowTotal += val;
+                        columnTotals[i] += val;
+                    } else if (targetYear <= '2026' && i <= new Date().getMonth() && targetYear == new Date().getFullYear()) {
+                         td.innerHTML = '<span style="color: var(--danger); font-weight: 600;">0</span>';
                     } else {
                         td.innerHTML = '<span style="color: var(--border);">--</span>';
                     }

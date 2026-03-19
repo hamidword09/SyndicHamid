@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Syndic Gravity - Cotisations</title>
+    <title>Syndic Gravity - Revenus</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -143,8 +143,8 @@
                     <li class="nav-item active">
                         <a href="revenues.html" class="nav-link">
                             <i data-lucide="arrow-down-to-line"></i>
-                            <span class="lang-fr">Cotisations</span>
-                            <span class="lang-ar hidden">المساهمات</span>
+                            <span class="lang-fr">Revenus</span>
+                            <span class="lang-ar hidden">المداخيل</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -229,10 +229,10 @@
             <!-- Top Header -->
             <header class="top-header">
                 <div class="header-left">
-                    <h2 class="page-title lang-fr">Suivi des Cotisations</h2>
-                    <h2 class="page-title lang-ar hidden">تتبع المساهمات</h2>
-                    <p class="page-subtitle lang-fr">Gestion des paiements mensuels obligatoires.</p>
-                    <p class="page-subtitle lang-ar hidden">إدارة المدفوعات الشهرية الإلزامية.</p>
+                    <h2 class="page-title lang-fr">Suivi des Revenus</h2>
+                    <h2 class="page-title lang-ar hidden">تتبع المداخيل</h2>
+                    <p class="page-subtitle lang-fr">Gestion des paiements mensuels et revenus de la résidence.</p>
+                    <p class="page-subtitle lang-ar hidden">إدارة المدفوعات الشهرية ومداخيل الإقامة.</p>
                 </div>
                 
                 <div class="header-actions">
@@ -295,17 +295,65 @@
                     </div>
                 </div>
 
-                <div class="action-bar glass-panel" style="margin-bottom: 20px;">
-                    <div class="search-box">
-                        <i data-lucide="search"></i>
-                        <input type="text" id="search-input-fr" class="lang-fr" placeholder="Rechercher un appartement ou nom...">
-                        <input type="text" id="search-input-ar" class="lang-ar hidden" placeholder="البحث عن شقة أو اسم...">
+                <div class="action-bar glass-panel" style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; gap: 10px; width: 100%;">
+                        <div class="search-box" style="flex: 1;">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="search-input-fr" class="lang-fr" placeholder="Rechercher un appartement ou nom...">
+                            <input type="text" id="search-input-ar" class="lang-ar hidden" placeholder="البحث عن شقة أو اسم...">
+                        </div>
+                        <button class="btn-primary" id="btn-search">
+                            <i data-lucide="search"></i>
+                            <span class="lang-fr">Rechercher</span>
+                            <span class="lang-ar hidden">بحث</span>
+                        </button>
+                        <button class="btn-secondary" id="btn-refresh" title="Mettre à jour">
+                            <i data-lucide="refresh-cw"></i>
+                            <span class="lang-fr">Mise à jour</span>
+                            <span class="lang-ar hidden">تحديث</span>
+                        </button>
                     </div>
-                    <div class="action-buttons">
-                        <button class="btn-primary admin-only" id="btn-remind-all">
-                            <i data-lucide="bell-ring"></i>
-                            <span class="lang-fr">Relancer les impayés</span>
-                            <span class="lang-ar hidden">تذكير بالمتأخرات</span>
+
+                    <!-- New Record Entry Form -->
+                    <div class="add-entry-form admin-only" style="display: flex; gap: 10px; flex-wrap: wrap; background: rgba(0,0,0,0.02); padding: 15px; border-radius: 10px; border: 1px dashed var(--border);">
+                        <div class="form-group" style="flex: 1; min-width: 120px; margin-bottom: 0;">
+                            <input type="text" id="new-apt" placeholder="Appartement (ex: Apt 04)" style="width: 100%;">
+                        </div>
+                        <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+                            <input type="text" id="new-owner" placeholder="Propriétaire" style="width: 100%;">
+                        </div>
+                        <div class="form-group" style="flex: 1; min-width: 120px; margin-bottom: 0;">
+                            <input type="number" id="new-amount" placeholder="Cotisation (MAD)" style="width: 100%;">
+                        </div>
+                        <div class="form-group" style="flex: 1; min-width: 100px; margin-bottom: 0;">
+                            <select id="new-month" style="width: 100%; height: 42px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-panel-solid); color: var(--text-main);">
+                                <option value="0">Janvier</option>
+                                <option value="1">Février</option>
+                                <option value="2" selected>Mars</option>
+                                <option value="3">Avril</option>
+                                <option value="4">Mai</option>
+                                <option value="5">Juin</option>
+                                <option value="6">Juillet</option>
+                                <option value="7">Août</option>
+                                <option value="8">Septembre</option>
+                                <option value="9">Octobre</option>
+                                <option value="10">Novembre</option>
+                                <option value="11">Décembre</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1; min-width: 100px; margin-bottom: 0;">
+                            <input type="number" id="new-year" placeholder="Année" value="2026" style="width: 100%;">
+                        </div>
+                        <div class="form-group" style="flex: 1; min-width: 120px; margin-bottom: 0;">
+                            <select id="new-status" style="width: 100%; height: 42px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-panel-solid); color: var(--text-main);">
+                                <option value="unpaid">Non Payé</option>
+                                <option value="paid">Payé</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary" id="btn-add-entry" style="height: 42px;">
+                            <i data-lucide="plus"></i>
+                            <span class="lang-fr">Ajouter</span>
+                            <span class="lang-ar hidden">إضافة</span>
                         </button>
                     </div>
                 </div>
@@ -329,12 +377,20 @@
                                         <span class="lang-ar hidden">المساهمة الشهرية</span>
                                     </th>
                                     <th>
-                                        <span class="lang-fr">Statut (Mars)</span>
-                                        <span class="lang-ar hidden">الحالة (مارس)</span>
+                                        <span class="lang-fr">Mois</span>
+                                        <span class="lang-ar hidden">الشهر</span>
+                                    </th>
+                                    <th>
+                                        <span class="lang-fr">Année</span>
+                                        <span class="lang-ar hidden">السنة</span>
+                                    </th>
+                                    <th>
+                                        <span class="lang-fr">Statut</span>
+                                        <span class="lang-ar hidden">الحالة</span>
                                     </th>
                                     <th class="text-right admin-only">
-                                        <span class="lang-fr">Marquer Payé</span>
-                                        <span class="lang-ar hidden">تحديد كمدفوع</span>
+                                        <span class="lang-fr">Actions</span>
+                                        <span class="lang-ar hidden">إجراءات</span>
                                     </th>
                                 </tr>
                             </thead>
@@ -348,13 +404,16 @@
                                         <strong>Hassan Lahlou</strong>
                                     </td>
                                     <td>100 MAD</td>
+                                    <td>Mars</td>
+                                    <td>2026</td>
                                     <td>
                                         <span class="badge paid lang-fr"><i data-lucide="check" style="width:12px; height:12px; display:inline-block; margin-right:4px;"></i> Payé le 02/03</span>
                                         <span class="badge paid lang-ar hidden"><i data-lucide="check" style="width:12px; height:12px; display:inline-block; margin-left:4px;"></i> دُفِع في 02/03</span>
                                     </td>
                                     <td class="text-right admin-only">
-                                        <button class="btn-icon-soft" disabled style="opacity:0.5"><i data-lucide="check-circle-2"></i></button>
-                                        <button class="btn-icon-soft" title="Historique"><i data-lucide="history"></i></button>
+                                        <button class="btn-icon-soft edit-btn" title="Modifier"><i data-lucide="edit-3"></i></button>
+                                        <button class="btn-icon-soft delete-btn" title="Supprimer" style="color: var(--danger);"><i data-lucide="trash-2"></i></button>
+                                        <button class="btn-icon-soft history-btn" title="Historique"><i data-lucide="history"></i></button>
                                     </td>
                                 </tr>
                                 
@@ -367,16 +426,20 @@
                                         <strong>Fatima Bennani</strong>
                                     </td>
                                     <td>100 MAD</td>
+                                    <td>Mars</td>
+                                    <td>2026</td>
                                     <td>
                                         <span class="badge unpaid status-badge lang-fr">Non Payé</span>
                                         <span class="badge unpaid status-badge lang-ar hidden">غير مدفوع</span>
                                     </td>
                                     <td class="text-right admin-only action-cell">
-                                        <button class="btn-pay mark-paid-btn">
+                                        <button class="btn-pay mark-paid-btn" title="Encaisser">
                                             <i data-lucide="plus-circle"></i>
                                             <span class="lang-fr">Encaisser</span>
                                             <span class="lang-ar hidden">تحصيل</span>
                                         </button>
+                                        <button class="btn-icon-soft edit-btn" title="Modifier"><i data-lucide="edit-3"></i></button>
+                                        <button class="btn-icon-soft delete-btn" title="Supprimer" style="color: var(--danger);"><i data-lucide="trash-2"></i></button>
                                     </td>
                                 </tr>
 
@@ -389,13 +452,16 @@
                                         <strong>Karim Idrissi</strong>
                                     </td>
                                     <td>400 MAD</td>
+                                    <td>Mars</td>
+                                    <td>2026</td>
                                     <td>
                                         <span class="badge paid lang-fr"><i data-lucide="check" style="width:12px; height:12px; display:inline-block; margin-right:4px;"></i> Payé le 10/03</span>
                                         <span class="badge paid lang-ar hidden"><i data-lucide="check" style="width:12px; height:12px; display:inline-block; margin-left:4px;"></i> دُفِع في 10/03</span>
                                     </td>
                                     <td class="text-right admin-only">
-                                        <button class="btn-icon-soft" disabled style="opacity:0.5"><i data-lucide="check-circle-2"></i></button>
-                                        <button class="btn-icon-soft" title="Historique"><i data-lucide="history"></i></button>
+                                        <button class="btn-icon-soft edit-btn" title="Modifier"><i data-lucide="edit-3"></i></button>
+                                        <button class="btn-icon-soft delete-btn" title="Supprimer" style="color: var(--danger);"><i data-lucide="trash-2"></i></button>
+                                        <button class="btn-icon-soft history-btn" title="Historique"><i data-lucide="history"></i></button>
                                     </td>
                                 </tr>
 
@@ -448,6 +514,8 @@
         </div>
     </div>
 
+    <script src="js/supabase_config.js"></script>
+    <script src="js/translations.js"></script>
     <script src="js/app.js"></script>
     <script src="js/revenues.js"></script>
     <script>
