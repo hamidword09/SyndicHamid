@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import { Languages } from 'lucide-react';
+import { Languages, TrendingUp, Users as UsersIcon, CheckCircle, XCircle, Settings, Bell, ShieldCheck } from 'lucide-react';
 import { useLang } from './i18n/LangContext';
 import { useAuth } from './auth/AuthContext';
 import Dashboard from './pages/Dashboard';
@@ -12,6 +12,8 @@ import Repairs from './pages/Repairs';
 import Maintenance from './pages/Maintenance';
 import Voting from './pages/Voting';
 import Login from './pages/Login';
+import Admin from './pages/Admin';
+import Users from './pages/Users';
 
 function App() {
   return (
@@ -50,16 +52,19 @@ const AppInner = () => {
           </div>
           <nav className="flex-1">
             <ul className="space-y-2">
-              <SidebarLink to="/" label={t("Dashboard")} />
-              <SidebarLink to="/residents" label={t("Residents")} />
-              <SidebarLink to="/revenus" label={t("Cotisations")} />
-              <SidebarLink to="/extra" label={t("Autres Revenus")} />
-              <SidebarLink to="/expenses" label={t("Dépenses")} />
-              <SidebarLink to="/repairs" label={t("Réparations")} />
-              <SidebarLink to="/maintenance" label={t("Maintenance")} />
-              <SidebarLink to="/voting" label={t("Votes & Décisions")} />
-              <SidebarLink to="/bilan" label={t("Bilan Annuel")} />
-            </ul>
+      <SidebarLink to="/" label={t("Dashboard")} icon={<TrendingUp size={18} />} />
+      <SidebarLink to="/residents" label={t("Residents")} icon={<UsersIcon size={18} />} />
+      <SidebarLink to="/revenus" label={t("Cotisations")} icon={<CheckCircle size={18} />} />
+      <SidebarLink to="/extra" label={t("Autres Revenus")} icon={<TrendingUp size={18} />} />
+      <SidebarLink to="/expenses" label={t("Dépenses")} icon={<XCircle size={18} />} />
+      <SidebarLink to="/repairs" label={t("Réparations")} icon={<Settings size={18} />} />
+      <SidebarLink to="/maintenance" label={t("Maintenance")} icon={<Bell size={18} />} />
+      <SidebarLink to="/voting" label={t("Votes & Décisions")} icon={<ShieldCheck size={18} />} />
+      <SidebarLink to="/bilan" label={t("Bilan Annuel")} icon={<TrendingUp size={18} />} />
+      <hr className="border-slate-700/50 my-4" />
+      <SidebarLink to="/users" label={t("Utilisateurs")} icon={<UsersIcon size={18} />} />
+      <SidebarLink to="/admin" label={t("Administration")} icon={<ShieldCheck size={18} />} />
+    </ul>
           </nav>
 
           <div className="pt-4 border-t border-slate-700 mt-4">
@@ -91,13 +96,15 @@ const AppInner = () => {
           <Route path="/repairs" element={<Repairs />} />
           <Route path="/maintenance" element={<Maintenance />} />
           <Route path="/voting" element={<Voting />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/users" element={<Users />} />
         </Routes>
       </main>
     </div>
   );
 };
 
-const SidebarLink = ({ to, label }: { to: string, label: string }) => {
+const SidebarLink = ({ to, label, icon }: { to: string, label: string, icon?: React.ReactNode }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
   
@@ -105,13 +112,14 @@ const SidebarLink = ({ to, label }: { to: string, label: string }) => {
     <li>
       <Link 
         to={to} 
-        className={`block p-3 rounded-xl transition-all ${
+        className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
           isActive 
             ? 'bg-indigo-600/10 text-indigo-400 font-medium' 
             : 'text-slate-400 hover:bg-slate-800 hover:text-white'
         }`}
       >
-        {label}
+        {icon && <span className={isActive ? 'text-indigo-400' : 'text-slate-500 group-hover:text-white'}>{icon}</span>}
+        <span>{label}</span>
       </Link>
     </li>
   );

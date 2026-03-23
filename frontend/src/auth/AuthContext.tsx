@@ -12,6 +12,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  loginAsDemo: (role: 'admin' | 'resident') => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -22,6 +23,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   signIn: async () => {},
   signOut: async () => {},
+  loginAsDemo: () => {},
 });
 
 const getRoleFromUser = (user: User | null | undefined): AppRole => {
@@ -84,6 +86,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // La session sera mise à jour via onAuthStateChange
   };
 
+  const loginAsDemo = (role: 'admin' | 'resident') => {
+    const mockSession = {
+      user: {
+        id: 'demo-id',
+        email: 'demo@syndic.com',
+        app_metadata: { role },
+        user_metadata: { role },
+      },
+      access_token: 'demo-token',
+    } as any;
+    setSession(mockSession);
+    localStorage.setItem('demo_session', JSON.stringify(mockSession));
+  };
+
+  useEffect(() => {
+    const saved = localStorage.getItem('demo_session');
+    if (saved) {
+      setSession(JSON.parse(saved));
+    }
+  }, []);
+
   const value = useMemo<AuthContextType>(
     () => ({
       session,
@@ -93,6 +116,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       loading,
       signIn,
       signOut,
+      loginAsDemo,
     }),
     [session, user, role, isAdmin, loading]
   );
